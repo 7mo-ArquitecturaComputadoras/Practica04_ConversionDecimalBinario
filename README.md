@@ -59,7 +59,7 @@ El programa implementa un ciclo de extracción-escritura sobre los bits del núm
 Inicio
  └─ EAX = numero, EDI = buffer
 
- ├─ EAX == 0 ? → escribir '0' → fin
+ ├─ EAX == 0 ? → caso_base: escribir '0' → fin
  └─ BSR: ECX = posición del MSB
 
  └─ SHL EAX, (31 - ECX)    (alineación)
@@ -72,7 +72,7 @@ escribir_bits:
  ├─ [EDI] = BL, EDI++, ECX--
  └─ ECX != 0 ? → repetir
 
-fin_funcion:
+fin:
  └─ [EDI] = 0 (terminador), EAX = buffer → retornar a C++
 ```
 
@@ -109,6 +109,7 @@ Resultado en buffer: `"101101"` → `31 30 31 31 30 31 00` (hex)
 | `JMP`       | Salto incondicional |
 | `PUSH`      | Guarda un valor en la pila |
 | `POP`       | Recupera el último valor guardado en la pila |
+| `RET`       | Regresa el control a la función que llamó |
 
 ---
 

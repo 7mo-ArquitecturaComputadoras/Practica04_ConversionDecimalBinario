@@ -7,7 +7,7 @@
 
 \usepackage[utf8]{inputenc}
 \usepackage[T1]{fontenc}
-\usepackage[english]{babel}
+\usepackage[spanish]{babel}
 \usepackage{geometry}
 \usepackage{graphicx}
 \usepackage{listings}
@@ -15,6 +15,7 @@
 \usepackage{booktabs}
 \usepackage{amsmath}
 \usepackage{hyperref}
+\usepackage{xurl}
 \usepackage{fancyhdr}
 \usepackage{float}
 \usepackage{caption}
@@ -34,8 +35,7 @@
                   JE,JZ,JNZ,INC,DEC,CMP,TEST,BSR,SHL,SETC,LEA,
                   EXTERN,BYTE,DWORD,PTR,EBP,ESP,ESI,EDI,EAX,EBX,
                   ECX,EDX,AL,BL,CL,DL,.586,.model,.data,.code,
-                  flat,stdcall,C,offset,option,casemap,none,
-                  include,includelib,DUP},
+                  flat,C,offset,DUP},
     sensitive=false,
     morecomment=[l]{;}
 }
@@ -50,8 +50,8 @@
     breaklines=true, captionpos=b, tabsize=4,
     showstringspaces=false,
     literate=
-        {á}{{\\'a}}1 {é}{{\\'e}}1 {í}{{\\'i}}1 {ó}{{\\'o}}1 {ú}{{\\'u}}1
-        {Á}{{\\'A}}1 {É}{{\\'E}}1 {Í}{{\\'I}}1 {Ó}{{\\'O}}1 {Ú}{{\\'U}}1
+        {á}{{\'a}}1 {é}{{\'e}}1 {í}{{\'i}}1 {ó}{{\'o}}1 {ú}{{\'u}}1
+        {Á}{{\'A}}1 {É}{{\'E}}1 {Í}{{\'I}}1 {Ó}{{\'O}}1 {Ú}{{\'U}}1
         {ñ}{{\~n}}1 {Ñ}{{\~N}}1
 }
 
@@ -160,9 +160,9 @@ El flujo general del programa es el siguiente:
             \node[process,   below=0.8cm of escero]  (bsr)     {BSR: ECX $\leftarrow$ posición del MSB};
             \node[process,   below=0.8cm of bsr]     (alinear) {SHL EAX, (31 - ECX): alinear a la izquierda};
             \node[decision,  below=0.8cm of alinear] (loop)    {ECX $> 0$?};
-            \node[process,   below=0.8cm of loop]    (extraer) {SHL EAX,1 → bit cae en CF};
-            \node[process,   below=0.8cm of extraer] (setc)    {SETC BL → BL = bit (0 ó 1)};
-            \node[process,   below=0.8cm of setc]    (escribir){BL + '0' → [EDI], EDI++, ECX$--$};
+            \node[process,   below=0.8cm of loop]    (extraer) {SHL EAX,1 $\to$ bit cae en CF};
+            \node[process,   below=0.8cm of extraer] (setc)    {SETC BL $\to$ BL = bit (0 ó 1)};
+            \node[process,   below=0.8cm of setc]    (escribir){BL + \texttt{'0'} $\to$ [EDI], EDI++, ECX$--$};
 
             % --- Nodos (Columna Derecha: Salidas y Fin) ---
             \node[result,    right=2.2cm of escero]  (cero)    {buffer $\leftarrow$ \texttt{'0'}};
@@ -171,26 +171,26 @@ El flujo general del programa es el siguiente:
 
             % --- Enlaces (Rutas directas sin cruces) ---
             \draw[arr] (inicio)  -- (escero);
-            
+
             % Bifurcación Inicial (Caso EAX == 0)
             \draw[arr] (escero)  -- node[above, font=\scriptsize]{Sí} (cero);
             \draw[arr] (escero)  -- node[right, font=\scriptsize]{No} (bsr);
-            
+
             % Preparación
             \draw[arr] (bsr)     -- (alinear);
             \draw[arr] (alinear) -- (loop);
-            
+
             % Bifurcación del Bucle
             \draw[arr] (loop)    -- node[right, font=\scriptsize]{Sí} (extraer);
             \draw[arr] (loop)    -- node[above, font=\scriptsize]{No} (fin);
-            
+
             % Interior del Bucle
             \draw[arr] (extraer) -- (setc);
             \draw[arr] (setc)    -- (escribir);
-            
-            % Línea de retorno del Bucle (viaja por el margen izquierdo vacío)
+
+            % Línea de retorno del Bucle (viaja por el margen izquierdo)
             \draw[arr] (escribir.west) -- ++(-1.0,0) |- (loop.west);
-            
+
             % Unión hacia el retorno
             \draw[arr] (cero)    -- (fin);
             \draw[arr] (fin)     -- (ret);
@@ -255,7 +255,7 @@ decimalABinario PROC numero:DWORD
     lea  edi, buffer            ; EDI apunta al buffer de salida
 
     test eax, eax               ; ?El numero es cero?
-    jz   caso_cero              ; Si es cero, caso especial
+    jz   caso_base              ; Si es cero, caso especial
 
     bsr  ecx, eax               ; ECX = posicion del bit mas significativo
 
@@ -275,13 +275,13 @@ escribir_bits:
     inc  edi                    ; Avanzamos el puntero
     dec  ecx                    ; Un bit menos
     jnz  escribir_bits          ; Repetir si quedan bits
-    jmp  fin_funcion
+    jmp  fin
 
-caso_cero:
-    mov  BYTE PTR [edi], '0'
-    inc  edi
+caso_base:
+    mov  BYTE PTR [edi], '0'    ; Escribimos '0' directamente
+    inc  edi                    ; Avanzamos el puntero
 
-fin_funcion:
+fin:
     mov  BYTE PTR [edi], 0      ; Terminador de cadena
     lea  eax, buffer            ; Retornamos la direccion del buffer
     pop  edi
@@ -329,9 +329,9 @@ En este programa intervienen varios registros del procesador, cada uno con una r
 
 \begin{itemize}
     \item \textbf{EAX} (\textit{Extended Accumulator Register}): contiene el número a convertir. A medida que el ciclo avanza, sus bits van siendo extraídos uno por uno mediante desplazamientos.
-    \item \textbf{ECX} (\textit{Extended Counter Register}): actúa como contador del ciclo. Se inicializa con la cantidad de bits significativos del número y se decrementa en cada iteración.
-    \item \textbf{EDX} (\textit{Extended Data Register}): almacena temporalmente la cantidad de lugares a desplazar para la alineación inicial del número.
-    \item \textbf{EBX} / \textbf{BL}: \texttt{BL} (byte bajo de \texttt{EBX}) recibe el bit extraído vía \texttt{SETC} y lo convierte al carácter de texto correspondiente antes de escribirlo.
+    \item \textbf{ECX} (\textit{Extended Counter Register}): actúa como contador del ciclo. Se inicializa con la posición del MSB más uno, y se decrementa en cada iteración hasta llegar a cero.
+    \item \textbf{EDX} (\textit{Extended Data Register}): almacena temporalmente la cantidad de lugares a desplazar para la alineación inicial del número (\texttt{31 - posición\_MSB}).
+    \item \textbf{EBX} / \textbf{BL}: \texttt{BL} (byte bajo de \texttt{EBX}) recibe el bit extraído vía \texttt{SETC} y lo convierte al carácter de texto correspondiente antes de escribirlo en el buffer.
     \item \textbf{EDI} (\textit{Extended Destination Index}): actúa como puntero de escritura sobre el buffer. Avanza un byte en cada iteración.
     \item \textbf{CL}: byte bajo de \texttt{ECX}; es el único registro que \texttt{SHL} acepta como operando de desplazamiento variable.
 \end{itemize}
@@ -363,20 +363,21 @@ Para el número decimal \textbf{45}:
 \begin{figure}[H]
     \centering
     \includegraphics[width=1\textwidth]{memoria_buffer.png}
-    \caption{Conversión de 45 DEC a BIN, donde buffer registra los cambios.}
+    \caption{Ventana Memory de Visual Studio: buffer con el resultado \texttt{"101101"} tras convertir 45.}
     \label{fig:memoria_buffer}
 \end{figure}
 
 \begin{figure}[H]
     \centering
     \includegraphics[width=1\textwidth]{consola_resultado.png}
-    \caption{Salida en consola: DEC 45 → BIN 101101}
+    \caption{Salida en consola: el usuario ingresa 45 y el programa devuelve \texttt{101101}.}
     \label{fig:consola_resultado}
 \end{figure}
 
+% ============================================================
 \section{Repositorio GitHub}
 
-https://github.com/7mo-ArquitecturaComputadoras/Practica04\_ConversionDecimalBinario
+\url{https://github.com/7mo-ArquitecturaComputadoras/Practica04_ConversionDecimalBinario}
 
 % ============================================================
 \section{Conclusiones}
@@ -385,7 +386,7 @@ https://github.com/7mo-ArquitecturaComputadoras/Practica04\_ConversionDecimalBin
     \item El programa demuestra que \textbf{convertir a binario es leer los bits de un número uno por uno}: la computadora no ``calcula'' la representación binaria, simplemente expone los bits que ya estaban ahí desde el principio.
     \item La instrucción \texttt{BSR} permite encontrar el bit más significativo en un solo paso de hardware, evitando ceros innecesarios a la izquierda sin necesidad de un ciclo adicional.
     \item El uso combinado de \texttt{SHL} y \texttt{SETC} es un patrón idiomático en ensamblador para extraer bits de forma secuencial: cada desplazamiento a la izquierda ``derrama'' un bit hacia la \textit{Carry Flag}, donde puede leerse directamente.
-    \item La \textbf{interfaz entre C++ y ensamblador} mediante \texttt{extern "C"} ilustra cómo los lenguajes de alto nivel pueden delegar operaciones críticas de bajo nivel a rutinas escritas directamente en ensamblador.
+    \item La \textbf{interfaz entre C++ y ensamblador} mediante \texttt{extern "C"} ilustra cómo los lenguajes de alto nivel pueden delegar operaciones críticas de bajo nivel a rutinas escritas directamente en ensamblador, devolviendo resultados a través de registros o punteros.
     \item Esta práctica evidencia que lo que un lenguaje como Python hace con \texttt{bin(45)} produce exactamente la misma secuencia de bits que este programa extrae manualmente: la diferencia es que aquí el proceso es completamente visible y controlado por el programador.
 \end{itemize}
 
