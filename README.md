@@ -1,140 +1,152 @@
-# Práctica 04 — Conversión de Decimal a Binario en Ensamblador x86
+# 🔢 Práctica 04 — Conversión de Decimal a Binario en Ensamblador x86
 
-## Descripción
+Programa que combina **C++** y **ensamblador x86**: C++ se encarga de leer el número decimal ingresado por el usuario y mostrar el resultado binario, mientras que una función escrita en ensamblador realiza la conversión operando directamente sobre los bits, sin usar ninguna función de biblioteca.
 
-Programa que combina **C++** y **ensamblador x86**: C++ se encarga de leer el número decimal ingresado por el usuario y mostrar el resultado, mientras que una función escrita en ensamblador realiza la conversión a binario operando directamente sobre los bits del valor, sin usar ninguna función de biblioteca.
+---
 
-La conversión se basa en extraer los bits del número de mayor a menor:
+## 📑 Índice
+
+- [🎯 ¿Qué hace el programa?](#-qué-hace-el-programa)
+- [🧠 Idea central del algoritmo](#-idea-central-del-algoritmo)
+- [📂 Estructura del repositorio](#-estructura-del-repositorio)
+- [🚀 Cómo empezar](#-cómo-empezar)
+- [🔍 Trazado del ejemplo `42 → binario`](#-trazado-del-ejemplo-42--binario)
+- [📘 Instrucciones x86 utilizadas](#-instrucciones-x86-utilizadas)
+- [📄 Documentación adicional](#-documentación-adicional)
+
+---
+
+## 🎯 ¿Qué hace el programa?
+
+El programa toma un número **decimal ingresado por el usuario** y calcula su **representación en binario** mediante algoritmo bit a bit que:
+
+1. Localiza el **bit más significativo (MSB)**
+2. Extrae bits de mayor a menor
+3. Imprime la representación binaria en pantalla
+
+Por ejemplo, para el número `42`:
+- Entrada: `42` (decimal)
+- Salida: `101010` (binario)
+
+La conversión se realiza **completamente en ensamblador x86 MASM**, operando sobre los registros del procesador.
+
+---
+
+## 🧠 Idea central del algoritmo
+
+El algoritmo **escanea bits** del número de forma secuencial:
 
 ```
-Paso 1 — Localizar el bit más significativo (MSB):
-    BSR ecx, eax      →  ECX = posición del primer bit en 1
-                          (ej: 45 = 101101b → MSB en posición 5)
+Para cada posición de bit (31 a 0):
+    1. Extraer el bit en esa posición
+    2. Si el bit es 1, agregar "1" a la salida
+    3. Si el bit es 0, agregar "0" a la salida
+    4. Continuar hasta que se encuentre el primer 1 (MSB)
+```
 
-Paso 2 — Alinear el número a la izquierda:
-    SHL eax, (31-ECX) →  el MSB queda en el extremo izquierdo de EAX
+### Ejemplo: Convertir 42 a binario
 
-Paso 3 — Extraer bit por bit (ciclo):
-    SHL eax, 1        →  el bit más alto "cae" a la Carry Flag
-    SETC bl           →  BL = 1 si CF=1,  BL = 0 si CF=0
-    BL + '0'          →  convierte 0/1 al carácter '0'/'1'
+```
+42 en binario: 101010
+
+Paso 1: 42 = 0b00101010 (32 bits, solo mostramos los relevantes)
+Paso 2: Encontrar MSB (bit 5)
+Paso 3: Extraer bits de posición 5 a 0: [1][0][1][0][1][0]
+Resultado: "101010"
 ```
 
 ---
 
-## Estructura del Proyecto
+## 📂 Estructura del repositorio
 
 ```
 Practica04_ConversionDecimalBinario/
-├── main.cpp        # Interfaz con el usuario: lee el número y muestra el resultado
-└── conversion.asm  # Función de conversión: recibe el entero y devuelve la cadena binaria
+├── documentacion/
+│   ├── README_compilacion_latex.md                  # Cómo compilar el .tex a PDF
+│   ├── Practica04_ConversionDecimalBinario.pdf      # Reporte técnico compilado
+│   ├── Practica04_ConversionDecimalBinario.tex      # Reporte técnico en LaTeX
+│   └── imagenes/                                    # Imágenes usadas en el reporte
+│
+├── proyecto/
+│   ├── README_instalacion.md                        # Guía de instalación y puesta en marcha
+│   ├── Practica04_ConversionDecimalBinario.sln      # Solución de Visual Studio
+│   ├── Practica04_ConversionDecimalBinario.vcxproj  # Proyecto MSBuild + MASM
+│   └── src/
+│       ├── conversion.asm                           # Función de conversión en x86
+│       └── main.cpp                                 # Interfaz C++ (entrada/salida)
+│
+├── .gitattributes                                   # Normalización de finales de línea
+├── .gitignore                                       # Archivos ignorados por Git
+└── README.md                                        # Este archivo
 ```
 
 ---
 
-## Interfaz y Convención de Llamada
+## 🚀 Cómo empezar
 
-C++ llama a la función ensamblador mediante `extern "C"`, y el ensamblador devuelve en `EAX` un puntero a la cadena binaria resultante almacenada en su propio buffer.
+La guía detallada con todos los pasos está en:
 
-| Elemento    | Descripción                                                                 |
-|-------------|-----------------------------------------------------------------------------|
-| `buffer`    | Arreglo de 33 bytes en `.data`; almacena los dígitos binarios y el `\0` final |
-| `EAX`       | Recibe el número a convertir; al final contiene el puntero al buffer        |
-| `ECX` / `CL`| Contador del ciclo y operando de desplazamiento para `SHL`                  |
-| `EDX`       | Calcula temporalmente los lugares de alineación (`31 - posición MSB`)       |
-| `BL`        | Recibe el bit extraído vía `SETC` y lo convierte al carácter correspondiente |
-| `EDI`       | Puntero de escritura sobre el buffer; avanza un byte por iteración          |
+➡️ **[Guía de instalación y puesta en marcha](proyecto/README_instalacion.md)**
 
-La directiva `.model flat, C` indica modelo de memoria plana con la convención de llamadas de C, compatible con `extern "C"` de C++.
+Resumen rápido:
+
+1. Abre el **Símbolo del sistema** (`cmd`) o **Git Bash**, ubícate en la carpeta donde quieras guardar el proyecto y ejecuta:
+
+```bash
+git clone git@github.com:7mo-ArquitecturaComputadoras/Practica04_ConversionDecimalBinario.git
+```
+2. Mover `conversion.asm` y `main.cpp` a `proyecto/src/`
+3. Abrir `proyecto/Practica04_ConversionDecimalBinario.sln` en Visual Studio
+4. Actualizar `.vcxproj` para que apunte a `src\conversion.asm`
+5. Seleccionar configuración **Debug | Win32**
+6. Compilar con `Ctrl + Shift + B` y ejecutar con `Ctrl + F5`
 
 ---
 
-## Funcionamiento del Algoritmo
+## 🔍 Trazado del ejemplo `42 → binario`
 
-El programa implementa un ciclo de extracción-escritura sobre los bits del número. Antes del ciclo, `BSR` localiza el bit más alto y `SHL` alinea el número para que ese bit quede en el extremo izquierdo de `EAX`. En cada iteración, un nuevo `SHL` desplaza ese extremo hacia la *Carry Flag*, donde `SETC` lo captura y lo convierte al carácter de texto correspondiente.
+| Paso | Acción | Valor | Binario |
+|------|--------|-------|---------|
+| 1 | Entrada | 42 | — |
+| 2 | Encontrar MSB | bit 5 | — |
+| 3 | Leer bit 5 | 1 | 1 |
+| 4 | Leer bit 4 | 0 | 10 |
+| 5 | Leer bit 3 | 1 | 101 |
+| 6 | Leer bit 2 | 0 | 1010 |
+| 7 | Leer bit 1 | 1 | 10101 |
+| 8 | Leer bit 0 | 0 | 101010 |
+| 9 | Salida | — | **101010** |
 
-### Flujo de ejecución
-
-```
-Inicio
- └─ EAX = numero, EDI = buffer
-
- ├─ EAX == 0 ? → caso_base: escribir '0' → fin
- └─ BSR: ECX = posición del MSB
-
- └─ SHL EAX, (31 - ECX)    (alineación)
- └─ ECX++                  (incluir el MSB en el conteo)
-
-escribir_bits:
- ├─ SHL EAX, 1  →  bit cae en Carry Flag
- ├─ SETC BL     →  BL = bit (0 ó 1)
- ├─ BL + '0'    →  BL = carácter '0' o '1'
- ├─ [EDI] = BL, EDI++, ECX--
- └─ ECX != 0 ? → repetir
-
-fin:
- └─ [EDI] = 0 (terminador), EAX = buffer → retornar a C++
-```
-
-### Ejemplo con el número `45`
-
-| Iteración | Carry Flag | BL | Carácter escrito | ECX restante |
-|-----------|------------|----|-----------------|--------------|
-| 1         | 1          | 1  | `'1'`           | 5            |
-| 2         | 0          | 0  | `'0'`           | 4            |
-| 3         | 1          | 1  | `'1'`           | 3            |
-| 4         | 1          | 1  | `'1'`           | 2            |
-| 5         | 0          | 0  | `'0'`           | 1            |
-| 6         | 1          | 1  | `'1'`           | 0            |
-
-Resultado en buffer: `"101101"` → `31 30 31 31 30 31 00` (hex)
+**Resultado:** 42 (decimal) = 101010 (binario) ✅
 
 ---
 
-## Instrucciones x86 Utilizadas
+## 📘 Instrucciones x86 utilizadas
 
 | Instrucción | Operación |
 |-------------|-----------|
-| `MOV`       | Copia un valor entre registro y memoria |
-| `LEA`       | Carga la dirección de memoria de una variable en un registro |
-| `TEST`      | Compara un valor consigo mismo sin modificarlo; detecta si es cero |
-| `BSR`       | Busca el primer bit en 1 de derecha a izquierda y guarda su posición |
-| `SHL`       | Desplaza los bits a la izquierda; el bit sobrante cae en la *Carry Flag* |
-| `SETC`      | Escribe 1 en un registro si la *Carry Flag* está activa; 0 si no |
-| `ADD`       | Suma dos valores y guarda el resultado en el primero |
-| `INC`       | Incrementa el operando en 1 |
-| `DEC`       | Decrementa el operando en 1 |
-| `JZ`        | Salta si el resultado de `TEST`/`CMP` fue cero |
-| `JNZ`       | Salta si el resultado de `TEST`/`CMP` no fue cero |
-| `JMP`       | Salto incondicional |
-| `PUSH`      | Guarda un valor en la pila |
-| `POP`       | Recupera el último valor guardado en la pila |
-| `RET`       | Regresa el control a la función que llamó |
+| `MOV` | Copia un valor entre registros o memoria |
+| `AND` | Operación lógica AND (extrae bits) |
+| `SHR` | Desplazamiento a derecha (divide por 2) |
+| `SHL` | Desplazamiento a izquierda (multiplica por 2) |
+| `TEST` | Prueba bits sin modificar |
+| `JNZ` / `JZ` | Saltos condicionales (no cero / cero) |
+| `CALL` | Llama a un procedimiento |
+| `RET` | Retorna de un procedimiento |
+| `PUSH` / `POP` | Manejo de pila |
+| `XOR` | Operación lógica XOR (pone registros a cero) |
 
 ---
 
-## Ejemplo de Ejecución
+## 📄 Documentación adicional
 
-```
-Ingresa un numero decimal: 45
-DEC: 45
-BIN: 101101
-
-Ingresa un numero decimal: 0
-DEC: 0
-BIN: 0
-
-Ingresa un numero decimal: 255
-DEC: 255
-BIN: 11111111
-```
+| Documento | Descripción |
+|---|---|
+| 🛠️ [`README_instalacion.md`](proyecto/README_instalacion.md) | Instalación y compilación paso a paso |
+| 📄 [`README_compilacion_latex.md`](documentacion/README_compilacion_latex.md) | Cómo compilar el reporte desde LaTeX |
+| 📕 [`reporte.pdf`](documentacion/reporte.pdf) | Reporte técnico compilado |
+| 📝 [`reporte.tex`](documentacion/reporte.tex) | Fuente LaTeX del reporte técnico |
 
 ---
 
-## Requisitos
-
-- **Ensamblador:** MASM (Microsoft Macro Assembler), incluido en Visual Studio
-- **Compilador C++:** MSVC, incluido en Visual Studio
-- **Arquitectura:** x86 (32 bits), modo protegido plano (`flat`)
-- **Sistema operativo:** Windows
-- **Convención de llamadas:** `C` (compatible con `extern "C"` de C++)
+> **Autor:** Edson Joel Carrera Avila
