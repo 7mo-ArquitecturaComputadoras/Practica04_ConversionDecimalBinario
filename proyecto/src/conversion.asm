@@ -24,7 +24,7 @@ decimalABinario PROC numero:DWORD
     mov  eax, numero            ; EAX = numero que queremos convertir
     lea  edi, buffer            ; EDI apunta al inicio del buffer donde escribiremos
 
-    ; --- ¿x == 0.0? ---
+  ; --- ¿numero == 0? ---
     test eax, eax               
     jz   caso_base              ; Si es cero, saltamos al caso_base
 

@@ -168,7 +168,7 @@ Para depuración avanzada (inspeccionar registros y el buffer en memoria):
 
 | Síntoma | Causa probable | Solución |
 |---|---|---|
-| `error A2006: undefined symbol : ExitProcess` | Configuración en **x64** con código de 32 bits | Cambia la plataforma a **Win32** en la barra superior |
+| `error LNK2019: unresolved external symbol _decimalABinario` | El símbolo no se exporta con .model flat, C | Verifica que el .asm use `.model flat, C` |
 | `error MSB6006: "ml.exe" exited with code 1` | Ruta del archivo `.asm` rota | Verifica que `proyecto/src/conversion.asm` exista |
 | **masm(.targets, .props)** no aparece en *Personalizaciones de compilación* | Falta la carga de trabajo *Desarrollo C++* | Abre **Visual Studio Installer**, pulsa **"Modificar"** y agrégala |
 | `git` no se reconoce como comando | Git no se instaló o no se agregó al PATH | Reinstala Git marcando *"Git from the command line and also from 3rd-party software"* |
