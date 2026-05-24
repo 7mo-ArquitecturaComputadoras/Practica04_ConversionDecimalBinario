@@ -11,12 +11,10 @@ Guía paso a paso para clonar, compilar y ejecutar la **Práctica 04 — Convers
 - [1️⃣ Instalar Git](#1️⃣-instalar-git)
 - [2️⃣ Instalar Visual Studio con MASM](#2️⃣-instalar-visual-studio-con-masm)
 - [3️⃣ Clonar el repositorio](#3️⃣-clonar-el-repositorio)
-- [4️⃣ Preparar la estructura de carpetas](#4️⃣-preparar-la-estructura-de-carpetas)
-- [5️⃣ Abrir la solución en Visual Studio](#5️⃣-abrir-la-solución-en-visual-studio)
-- [6️⃣ Habilitar MASM en el proyecto](#6️⃣-habilitar-masm-en-el-proyecto)
-- [7️⃣ Actualizar .vcxproj](#7️⃣-actualizar-vcxproj)
-- [8️⃣ Compilar el proyecto](#8️⃣-compilar-el-proyecto)
-- [9️⃣ Ejecutar y observar el resultado](#9️⃣-ejecutar-y-observar-el-resultado)
+- [4️⃣ Abrir la solución en Visual Studio](#4️⃣-abrir-la-solución-en-visual-studio)
+- [5️⃣ Habilitar MASM en el proyecto](#5️⃣-habilitar-masm-en-el-proyecto)
+- [6️⃣ Compilar el proyecto](#6️⃣-compilar-el-proyecto)
+- [7️⃣ Ejecutar y observar el resultado](#7️⃣-ejecutar-y-observar-el-resultado)
 - [❗ Problemas comunes](#-problemas-comunes)
 
 ---
@@ -68,37 +66,7 @@ cd Practica04_ConversionDecimalBinario
 
 ---
 
-## 4️⃣ Preparar la estructura de carpetas
-
-**IMPORTANTE:** Debes mover los archivos a la estructura estándar:
-
-### En Windows (PowerShell o cmd):
-
-```bash
-# Crear carpetas
-mkdir proyecto\src
-mkdir documentacion\imagenes
-
-# Mover código fuente
-move conversion.asm proyecto\src\
-move main.cpp proyecto\src\
-
-# Mover documentación
-move Practica04_ConversionDecimalBinario.tex documentacion\reporte.tex
-move Practica04_ConversionDecimalBinario.pdf documentacion\reporte.pdf
-move *.png documentacion\imagenes\
-
-# Mover archivos de proyecto Visual Studio
-move Practica04_ConversionDecimalBinario.sln proyecto\
-move Practica04_ConversionDecimalBinario.vcxproj proyecto\
-
-# Limpiar
-rmdir Reporte_LaTeX
-```
-
----
-
-## 5️⃣ Abrir la solución en Visual Studio
+## 4️⃣ Abrir la solución en Visual Studio
 
 1. Entra a la carpeta `proyecto/`
 2. Haz doble clic en **`Practica04_ConversionDecimalBinario.sln`**
@@ -106,7 +74,7 @@ rmdir Reporte_LaTeX
 
 ---
 
-## 6️⃣ Habilitar MASM en el proyecto
+## 5️⃣ Habilitar MASM en el proyecto
 
 1. Clic derecho en el proyecto (Explorador de soluciones)
 2. **"Generar dependencias"** → **"Personalizaciones de compilación…"**
@@ -115,18 +83,7 @@ rmdir Reporte_LaTeX
 
 ---
 
-## 7️⃣ Actualizar .vcxproj
-
-1. Clic derecho en el proyecto → **"Descargar proyecto"**
-2. Clic derecho → **"Editar [proyecto].vcxproj"**
-3. Busca: `<MASM Include="conversion.asm" />`
-4. Cámbialo a: `<MASM Include="src\conversion.asm" />`
-5. Guarda (`Ctrl + S`)
-6. Clic derecho → **"Cargar proyecto"**
-
----
-
-## 8️⃣ Compilar el proyecto
+## 6️⃣ Compilar el proyecto
 
 1. Selecciona **Debug | Win32** (32 bits, OBLIGATORIO)
 2. `Ctrl + Shift + B` o **Compilar → Compilar solución**
@@ -134,7 +91,7 @@ rmdir Reporte_LaTeX
 
 ---
 
-## 9️⃣ Ejecutar y observar el resultado
+## 7️⃣ Ejecutar y observar el resultado
 
 El programa solicita un **número decimal** e imprime su **binario**:
 
