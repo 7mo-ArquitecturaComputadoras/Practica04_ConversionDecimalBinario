@@ -63,8 +63,8 @@ Resultado: "101010"
 Practica04_ConversionDecimalBinario/
 ├── documentacion/
 │   ├── README_compilacion_latex.md                  # Cómo compilar el .tex a PDF
-│   ├── Practica04_ConversionDecimalBinario.pdf      # Reporte técnico compilado
-│   ├── Practica04_ConversionDecimalBinario.tex      # Reporte técnico en LaTeX
+│   ├── reporte.pdf                                  # Reporte técnico compilado
+│   ├── reporte.tex                                  # Reporte técnico en LaTeX
 │   └── imagenes/                                    # Imágenes usadas en el reporte
 │
 ├── proyecto/
