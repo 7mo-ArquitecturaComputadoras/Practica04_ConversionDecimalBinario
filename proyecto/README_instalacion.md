@@ -69,7 +69,7 @@ cd Practica04_ConversionDecimalBinario
 ## 4️⃣ Abrir la solución en Visual Studio
 
 1. Entra a la carpeta `proyecto/`
-2. Haz doble clic en **`Practica04_ConversionDecimalBinario.sln`**
+2. Haz doble clic en **`Practica04_ConversionDecimalBinario.slnx`**
 3. Visual Studio abre el proyecto
 
 ---

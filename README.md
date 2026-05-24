@@ -69,7 +69,7 @@ Practica04_ConversionDecimalBinario/
 │
 ├── proyecto/
 │   ├── README_instalacion.md                        # Guía de instalación y puesta en marcha
-│   ├── Practica04_ConversionDecimalBinario.sln      # Solución de Visual Studio
+│   ├── Practica04_ConversionDecimalBinario.slnx     # Solución de Visual Studio
 │   ├── Practica04_ConversionDecimalBinario.vcxproj  # Proyecto MSBuild + MASM
 │   └── src/
 │       ├── conversion.asm                           # Función de conversión en x86
