@@ -95,11 +95,9 @@ Resumen rápido:
 ```bash
 git clone git@github.com:7mo-ArquitecturaComputadoras/Practica04_ConversionDecimalBinario.git
 ```
-2. Mover `conversion.asm` y `main.cpp` a `proyecto/src/`
-3. Abrir `proyecto/Practica04_ConversionDecimalBinario.sln` en Visual Studio
-4. Actualizar `.vcxproj` para que apunte a `src\conversion.asm`
-5. Seleccionar configuración **Debug | Win32**
-6. Compilar con `Ctrl + Shift + B` y ejecutar con `Ctrl + F5`
+2. Abrir `proyecto/Practica04_ConversionDecimalBinario.slnx` en Visual Studio
+3. Seleccionar configuración **Debug | Win32**
+4. Compilar con `Ctrl + Shift + B` y ejecutar con `Ctrl + F5`
 
 ---
 
